@@ -1,0 +1,67 @@
+# VeriDictum AI — pre-commit configuration
+#
+# Install once:
+#     pip install pre-commit && pre-commit install
+#
+# Run on every staged change automatically. Run on the whole tree:
+#     pre-commit run --all-files
+
+repos:
+  # ── Generic hygiene ────────────────────────────────────────────────────
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-merge-conflict
+      - id: check-added-large-files
+        args: ["--maxkb=512"]
+      - id: check-yaml
+        # Helm templates and GitHub Actions YAML files can contain
+        # template directives that fail strict YAML parsing.
+        exclude: |
+          (?x)^(
+              \.github/workflows/.*\.yml
+          )$
+      - id: check-toml
+      - id: check-json
+        exclude: "node_modules|frontend/package-lock.json"
+      - id: detect-private-key
+      - id: mixed-line-ending
+        args: ["--fix=lf"]
+
+  # ── Secret scanning ────────────────────────────────────────────────────
+  # Pre-commit blocks accidental commits of OpenAI / Azure / DeepInfra keys.
+  - repo: https://github.com/Yelp/detect-secrets
+    rev: v1.5.0
+    hooks:
+      - id: detect-secrets
+        args: ["--baseline", ".secrets.baseline"]
+        exclude: "package-lock.json|node_modules|backend/\\.venv"
+
+  # ── Python: ruff (lint + import sort) + black (format) ─────────────────
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.7.4
+    hooks:
+      - id: ruff
+        args: ["--fix"]
+        files: ^backend/
+      - id: ruff-format
+        files: ^backend/
+
+  # ── Frontend: prettier + tsc strict + ESLint (via npm) ─────────────────
+  - repo: local
+    hooks:
+      - id: prettier-frontend
+        name: prettier (frontend)
+        entry: bash -c 'cd frontend && npx prettier --write "src/**/*.{ts,tsx,css,md,json}"'
+        language: system
+        pass_filenames: false
+        files: ^frontend/src/
+
+      - id: tsc-noemit
+        name: TypeScript strict type-check
+        entry: bash -c 'cd frontend && npx tsc --noEmit'
+        language: system
+        pass_filenames: false
+        files: ^frontend/src/.*\.(ts|tsx)$

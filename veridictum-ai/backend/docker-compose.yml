@@ -1,0 +1,120 @@
+# VeriDictum AI — Docker Compose
+# Uses existing shared postgres on host:5432 and shared redis
+
+services:
+
+  # ── FastAPI backend ─────────────────────────────────────────────────────────
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: veridictum_api
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql+asyncpg://veridictum:veridictum_pass@host.docker.internal:5432/veridictum_db
+      SYNC_DATABASE_URL: postgresql://veridictum:veridictum_pass@host.docker.internal:5432/veridictum_db
+      REDIS_URL: redis://host.docker.internal:6379/0
+      CELERY_BROKER_URL: redis://host.docker.internal:6379/1
+      CELERY_RESULT_BACKEND: redis://host.docker.internal:6379/2
+    ports:
+      - "8000:8000"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - ./tmp_storage:/app/tmp_storage
+    restart: unless-stopped
+
+  # ── Celery — transcription worker ───────────────────────────────────────────
+  celery_transcription:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: veridictum_celery_transcription
+    command: celery -A app.tasks.celery_app worker -Q transcription -c 2 -n transcription@%h --loglevel=info
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql+asyncpg://veridictum:veridictum_pass@host.docker.internal:5432/veridictum_db
+      SYNC_DATABASE_URL: postgresql://veridictum:veridictum_pass@host.docker.internal:5432/veridictum_db
+      REDIS_URL: redis://host.docker.internal:6379/0
+      CELERY_BROKER_URL: redis://host.docker.internal:6379/1
+      CELERY_RESULT_BACKEND: redis://host.docker.internal:6379/2
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - ./tmp_storage:/app/tmp_storage
+    restart: unless-stopped
+
+  # ── Celery — OCR worker ──────────────────────────────────────────────────────
+  celery_ocr:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: veridictum_celery_ocr
+    command: celery -A app.tasks.celery_app worker -Q ocr -c 4 -n ocr@%h --loglevel=info
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql+asyncpg://veridictum:veridictum_pass@host.docker.internal:5432/veridictum_db
+      SYNC_DATABASE_URL: postgresql://veridictum:veridictum_pass@host.docker.internal:5432/veridictum_db
+      REDIS_URL: redis://host.docker.internal:6379/0
+      CELERY_BROKER_URL: redis://host.docker.internal:6379/1
+      CELERY_RESULT_BACKEND: redis://host.docker.internal:6379/2
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - ./tmp_storage:/app/tmp_storage
+    restart: unless-stopped
+
+  # ── Celery — analysis worker ─────────────────────────────────────────────────
+  celery_analysis:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: veridictum_celery_analysis
+    command: celery -A app.tasks.celery_app worker -Q analysis -c 2 -n analysis@%h --loglevel=info
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql+asyncpg://veridictum:veridictum_pass@host.docker.internal:5432/veridictum_db
+      SYNC_DATABASE_URL: postgresql://veridictum:veridictum_pass@host.docker.internal:5432/veridictum_db
+      REDIS_URL: redis://host.docker.internal:6379/0
+      CELERY_BROKER_URL: redis://host.docker.internal:6379/1
+      CELERY_RESULT_BACKEND: redis://host.docker.internal:6379/2
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    restart: unless-stopped
+
+  # ── Celery — reports worker ──────────────────────────────────────────────────
+  celery_reports:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: veridictum_celery_reports
+    command: celery -A app.tasks.celery_app worker -Q reports -c 2 -n reports@%h --loglevel=info
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql+asyncpg://veridictum:veridictum_pass@host.docker.internal:5432/veridictum_db
+      SYNC_DATABASE_URL: postgresql://veridictum:veridictum_pass@host.docker.internal:5432/veridictum_db
+      REDIS_URL: redis://host.docker.internal:6379/0
+      CELERY_BROKER_URL: redis://host.docker.internal:6379/1
+      CELERY_RESULT_BACKEND: redis://host.docker.internal:6379/2
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - ./tmp_storage:/app/tmp_storage
+    restart: unless-stopped
+
+  # ── Flower — Celery monitoring UI ───────────────────────────────────────────
+  flower:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: veridictum_flower
+    command: celery -A app.tasks.celery_app flower --port=5555
+    env_file: .env
+    environment:
+      CELERY_BROKER_URL: redis://host.docker.internal:6379/1
+      CELERY_RESULT_BACKEND: redis://host.docker.internal:6379/2
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    ports:
+      - "5555:5555"
+    restart: unless-stopped

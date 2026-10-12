@@ -1,0 +1,15 @@
+.env
+**/.env
+**/.env.*
+!**/.env.example
+**/secrets.toml
+**/tmp_storage/
+**/uploads/
+**/uploaded_files/
+**/.venv/
+**/venv/
+**/__pycache__/
+*.py[cod]
+*.db
+*.sqlite
+*.sqlite3

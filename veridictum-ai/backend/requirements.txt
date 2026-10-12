@@ -1,0 +1,49 @@
+# VeriDictum AI — Backend Dependencies
+
+# --- Web framework ---
+fastapi==0.115.6
+uvicorn[standard]==0.32.1
+python-multipart==0.0.17
+
+# --- Database ---
+sqlalchemy[asyncio]==2.0.36
+asyncpg==0.30.0
+alembic==1.14.0
+greenlet==3.1.1
+aiosqlite>=0.20.0
+
+# --- Settings & validation ---
+pydantic==2.10.3
+pydantic-settings==2.6.1
+email-validator==2.2.0
+
+# --- Auth & security ---
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+bcrypt==4.2.1
+cryptography==43.0.3
+pyotp==2.9.0
+qrcode[pil]==8.0
+
+# --- AI / ML ---
+openai==1.58.1
+httpx==0.27.2
+pinecone==5.4.2
+
+# --- Azure ---
+azure-ai-formrecognizer==3.3.3
+azure-storage-blob==12.24.0
+
+# --- Task queue ---
+celery[redis]==5.4.0
+redis[hiredis]==5.2.1
+
+# --- Email ---
+aiosmtplib==3.0.1
+
+# --- PDF generation ---
+reportlab==4.2.5
+Pillow==11.0.0
+
+# --- Logging ---
+structlog==24.4.0

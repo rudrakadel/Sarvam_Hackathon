@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+
+    <!-- Primary -->
+    <title>Sarvam Nyaya — Courtroom Intelligence Platform</title>
+    <meta name="description"
+          content="Enterprise legal-AI platform that ingests courtroom audio + legal documents, detects factual contradictions with Sarvam AI, and answers natural-language questions about case evidence with citation-anchored RAG." />
+    <meta name="application-name" content="Sarvam Nyaya" />
+    <meta name="author" content="Sarvam AI" />
+    <meta name="generator" content="Sarvam Nyaya 1.2.0" />
+    <meta name="robots" content="noindex, nofollow" />
+
+    <!-- Theme-color (matches the brand navy in light, navy-900 in dark) -->
+    <meta name="theme-color" content="#1B2B5E" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#07091B" media="(prefers-color-scheme: dark)" />
+    <meta name="color-scheme" content="light dark" />
+
+    <!-- iOS / Safari standalone hints -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Sarvam Nyaya" />
+
+    <!-- Open Graph (LinkedIn, Slack, Discord, etc.) -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Sarvam Nyaya" />
+    <meta property="og:title" content="Sarvam Nyaya — Courtroom Intelligence Platform" />
+    <meta property="og:description"
+          content="Detect factual contradictions between testimony and documents. Every AI claim cited to a transcript timestamp or document page." />
+    <meta property="og:locale" content="en_US" />
+
+    <!-- Twitter / X -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Sarvam Nyaya — Courtroom Intelligence Platform" />
+    <meta name="twitter:description"
+          content="Detect contradictions in courtroom evidence. Every AI claim cited to a transcript timestamp or document page." />
+
+    <!-- Favicon (kept as the Vite default until a branded asset lands) -->
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+
+    <!-- Fonts — preconnect + display=swap so first paint isn't blocked. -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+    <!-- Prevent dark-mode FOUC: read the persisted theme before React mounts.
+         The themeStore keeps `mode` in localStorage["veridictum-theme"]; if
+         the user pinned dark, apply the `dark` class on <html> immediately
+         so the very first paint matches their preference. -->
+    <script>
+      (function () {
+        try {
+          var raw = localStorage.getItem("veridictum-theme");
+          var mode = "system";
+          if (raw) {
+            var parsed = JSON.parse(raw);
+            mode = (parsed && parsed.state && parsed.state.mode) || "system";
+          }
+          var dark = mode === "dark" ||
+                     (mode === "system" &&
+                      window.matchMedia &&
+                      window.matchMedia("(prefers-color-scheme: dark)").matches);
+          if (dark) document.documentElement.classList.add("dark");
+          document.documentElement.dataset.theme = dark ? "dark" : "light";
+        } catch (e) { /* fail-open */ }
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+    <noscript>
+      <div style="padding:2rem; font-family: Inter, sans-serif; text-align: center;">
+        Sarvam Nyaya requires JavaScript to be enabled. Please enable JavaScript and reload.
+      </div>
+    </noscript>
+  </body>
+</html>

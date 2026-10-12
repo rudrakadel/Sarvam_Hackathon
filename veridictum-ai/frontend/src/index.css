@@ -1,0 +1,127 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    font-feature-settings: "cv11", "ss01";
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-gray-50 text-gray-900 dark:bg-navy-900 dark:text-gray-100;
+    transition: background-color 200ms ease, color 200ms ease;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-gray-300 dark:bg-navy-700 rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-gray-400 dark:bg-navy-600;
+  }
+}
+
+@layer components {
+  /* Focus ring utility for accessibility */
+  .focus-ring {
+    @apply focus:outline-none focus:ring-2 focus:ring-navy-500 focus:ring-offset-2;
+  }
+
+  /* Animated loading dots */
+  .loading-dot {
+    @apply w-2 h-2 rounded-full bg-current animate-bounce;
+  }
+}
+
+@layer utilities {
+  /* Text balance for headings */
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  /* Truncate with ellipsis at N lines */
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   Print stylesheet — used when an attorney exports a case detail or a
+   contradiction report from the browser ("Save as PDF" or Cmd+P).
+   - Hide the app shell (sidebar, topbar, command palette) — they're not
+     useful in printed evidence.
+   - Force light colours regardless of the in-app theme so the print
+     doesn't waste toner on a dark background.
+   - Avoid page breaks inside contradiction cards.
+   - Strip Vera's animated halo so the print doesn't try to render gold.
+   ───────────────────────────────────────────────────────────────────────── */
+@media print {
+  /* Always print in light mode, even if the user is in dark UI mode. */
+  :root, html.dark, html[data-theme="dark"] {
+    color-scheme: light !important;
+  }
+  html, body {
+    background: #fff !important;
+    color: #0B1437 !important;
+  }
+  /* App shell — hide everything that isn't content. */
+  aside, header, nav[aria-label], button[aria-label="Toggle theme"],
+  button[aria-label="Open command palette"],
+  [role="dialog"][aria-label="Command palette"] {
+    display: none !important;
+  }
+  main {
+    overflow: visible !important;
+    height: auto !important;
+    padding: 0 !important;
+  }
+  /* Avoid orphans — keep each contradiction card together on one page. */
+  [data-card], .contradiction-card, article {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+  /* Don't waste ink on shadows / animations. */
+  * {
+    box-shadow: none !important;
+    text-shadow: none !important;
+    animation: none !important;
+    transition: none !important;
+  }
+  /* Print-friendly link styling. */
+  a[href]:after {
+    content: " (" attr(href) ")";
+    font-size: 0.85em;
+    color: #6B7388;
+  }
+  a[href^="#"]:after,
+  a[href^="javascript:"]:after {
+    content: "";
+  }
+}
